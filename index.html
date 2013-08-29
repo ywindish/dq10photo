@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>DQX Photo Downloader</title>
+<link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+</head>
+<body>
+<div class="container">
+
+<h1><img src="icon.png" width="30px" height="30px"> DQX Photo Downloader</h1>
+
+<p><a href="http://hiroba.dqx.jp/sc/" target="_blank">ドラゴンクエストX・目覚めし冒険者の広場</a> の「思い出アルバム」から写真をダウンロードします。</p>
+<hr>
+
+<form>
+<fieldset>
+<p id="warning" class="text-warning">キャラクターリストを読み込めませんでした。冒険者の広場にログインしていないかもしれません。</p>
+<div id="character_list">
+</div>
+<input type="button" class="btn" value="写真をダウンロードする" id="download" disabled="disabled"/>
+</fieldset>
+</form>
+
+<hr>
+<address>Author <a href="http://twitter.com/ywindish" target="_blank">@ywindish</a></address>
+
+</div>
+
+<script src="js/jquery-2.0.2.min.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+{
+  "name": "DQX Photo Downloader",
+  "version": "1.0",
+  "manifest_version": 2,
+
+  "description": "ドラゴンクエストX・目覚めし冒険者の広場の「思い出アルバム」から写真をダウンロードします。",
+  "icons": { 
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+   },
+
+  "app": {
+    "launch": {
+      "local_path": "index.html"
+    }
+  },
+
+  "permissions": [
+    "https://*.dqx.jp/",
+    "http://*.dqx.jp/"
+  ]
+}
