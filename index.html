@@ -15,8 +15,10 @@
 
 <form>
 <fieldset>
-<p id="warning" class="text-warning">キャラクターリストを読み込めませんでした。冒険者の広場にログインしていないかもしれません。</p>
-<div id="character_list">
+<p id="warning" class="text-warning">キャラクター情報を読み込めませんでした。冒険者の広場にログインしていないかもしれません。</p>
+<div id="character_info">
+<p>現在、 <span class="text-info"> <strong id="character_name"></strong> </span> が広場にログイン中です。</p>
+<input type="hidden" id="character_id">
 </div>
 <input type="button" class="btn" value="写真をダウンロードする" id="download" disabled="disabled"/>
 </fieldset>

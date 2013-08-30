@@ -1,29 +1,30 @@
-(function(){
+(function() {
 
 var DQXPhoto = {
 
 	baseUrl: 'http://hiroba.dqx.jp', 
-	charListName: 'charlist',
 	charId: null,
+	charName: null,
 
 	download: function() {
 		this.requestPhotoPage(0, function(resultPage){
-			var regex = new RegExp('\/sc\/character\/' + DQXPhoto.charId + '\/picture\/page\/([0-9]+)', "g");
+			// /sc/character/1234567890/picture/page/0
+			var regex = new RegExp('\/sc\/character\/' + this.charId + '\/picture\/page\/([0-9]+)', "g");
 			var pageUrl;
 			var maxPageNo;
 			while ((pageUrl = regex.exec(resultPage)) != null) {
 				maxPageNo = pageUrl[1];
 			}
 			for (var page = 0; page <= maxPageNo; page++) {
-				DQXPhoto.downloadPhotos(page);
+				this.downloadPhotos(page);
 			}
 		});
 	},
 
 	downloadPhotos: function(page) {
-		this.requestPhotoPage(page, function(resultPage) {		
+		this.requestPhotoPage(page, function(resultPage) {
 			var regexString =
-				DQXPhoto.escapeRegExp('http://img.dqx.jp/smpicture/download/webpicture/' + DQXPhoto.charId + '/thum2/')
+				this.escapeRegExp('http://img.dqx.jp/smpicture/download/webpicture/' + this.charId + '/thum2/')
 				+ '([0-9]+)\/';
 			var regex = new RegExp(regexString, "g");
 			var photoUrls = new Array();
@@ -35,7 +36,7 @@ var DQXPhoto = {
 				});
 			}
 			for (var i = 0; i < photoUrls.length; i++) {
-				DQXPhoto.downloadFile(photoUrls[i].url, photoUrls[i].id);
+				this.downloadFile(photoUrls[i].url, photoUrls[i].id);
 			}
 		});
 	},
@@ -57,29 +58,25 @@ var DQXPhoto = {
 		$.get(url, func);
 	},
 
-	loadCharacterList: function() {
-		var url = this.baseUrl + '/sc/home/characterchange/';
+	loadCharacterInfo: function() {
+		var url = this.baseUrl + '/sc/home/';
 		$.get(url, function(resultPage) {
-			var regex = new RegExp('([0-9]+)\.png" \/> ([^<]+)<\/td>', "g");
+			// <img src="http://hiroba.dqx.jp/sc/character/{charId}/img/bup/" alt="{charName}" />
+			var pattern = '<img src\="http\:\/\/hiroba.dqx.jp\/sc\/character\/([0-9]+)\/img\/bup\/" alt\="([^"]+)" />';
+			var regex = new RegExp(pattern, 'g');
 			var matchText;
 			while ((matchText = regex.exec(resultPage)) != null) {
-				var charId = matchText[1];
-				var charName = matchText[2];
-				var $label = $('<label class="radio"> ' + charName + '</label>'); // bootstrap
-				var $input = $('<input type="radio">').val(charId).attr({
-					id: charId,
-					name: DQXPhoto.charListName
-				});
-				$('#character_list').append($label.append($input))
-					.append('<br/>');
+				this.charId = matchText[1];
+				this.charName = matchText[2];
 			}
+			if (this.charId !== null) {
+				$('#character_name').text(this.charName);
+				$("#warning").css("display", "none");
+			}
+			$("#download").attr("disabled", this.charId === null);
 		});
 	},
 
-	isCharacterSelected: function() {
-		return $('input:checked[name=' + this.charListName + ']').length > 0;
-	},
-	
 	// see: https://developer.mozilla.org/ja/docs/JavaScript/Guide/Regular_Expressions
 	escapeRegExp: function(string) {
 		return string.replace(/([.*+?^=!:${}()|[\]\/\\])/g, "\\$1");
@@ -87,22 +84,11 @@ var DQXPhoto = {
 }
 
 $(document).ready(function() {
-
 	$("#download").click(function() {
-		DQXPhoto.charId = 
-			$("input:checked[name=" + DQXPhoto.charListName + "]").val();
 		DQXPhoto.download();
 	});
 
-	$("#character_list").click(function() {
-		$("#download").attr("disabled", ! DQXPhoto.isCharacterSelected());
-	});
-
-	DQXPhoto.loadCharacterList();
-	if ($('#character_list').children('input:radio')) {
-		$("#warning").css("display", "none");
-	}
-
+	DQXPhoto.loadCharacterInfo();
 });
 
 })();
