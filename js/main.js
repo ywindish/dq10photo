@@ -25,22 +25,45 @@ var DQXPhoto = {
 	downloadPhotos: function(page) {
 		var _this = this;
 		this.requestPhotoPage(page, function(resultPage) {
-			var regexString =
-				_this.escapeRegExp('http://img.dqx.jp/smpicture/download/webpicture/' + _this.charId + '/thum2/')
-				+ '([0-9]+)\/';
-			var regex = new RegExp(regexString, "g");
-			var photoUrls = new Array();
-			var _thumUrl;
-			while ((_thumUrl = regex.exec(resultPage)) != null) {
-				photoUrls.push({
-					url: _thumUrl[0].replace('thum2', 'original'),
-					id: _thumUrl[1]
-				});
-			}
-			for (var i = 0; i < photoUrls.length; i++) {
-				_this.downloadFile(photoUrls[i].url, photoUrls[i].id);
+			var items = _this.parsePhotoPage(resultPage);
+			for (var i = 0; i < items.length; i++) {
+				_this.downloadFile(items[i].url,
+					items[i].dateTime + '-' + items[i].id + '-' + items[i].location);
 			}
 		}, this);
+	},
+
+	parsePhotoPage: function(page) {
+		var items = new Array();
+		var $page = $('.contentsTable1TD1', page);
+
+		$page.each(function(index, el) {
+			var imageId, imageUrl, dateTime, location;
+
+			$(el).find('img').each(function(index, el) {
+				imageUrl = $(el).attr('src');
+			});
+
+			var imageIdSearchResult = imageUrl.match(/[0-9]+\/$/);
+			if (imageIdSearchResult !== null) {
+				imageId = imageIdSearchResult[0].replace(/\//, '');
+			}
+
+			$(el).find('.thumbLocationAndDate').each(function(index, el) {
+				var dateTimeLocation = $(el).html().split('<br>');
+				dateTime = dateTimeLocation[0].replace(/[^0-9]/g, '');
+				location = dateTimeLocation[1];
+			});
+
+			items.push({
+				id: imageId,
+				url: imageUrl,
+				dateTime: dateTime,
+				location: location
+			})
+		});;
+
+		return items;
 	},
 
 	downloadFile: function(url, filename) {
