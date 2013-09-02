@@ -7,24 +7,26 @@ var DQXPhoto = {
 	charName: null,
 
 	download: function() {
+		var _this = this;
 		this.requestPhotoPage(0, function(resultPage){
 			// /sc/character/1234567890/picture/page/0
-			var regex = new RegExp('\/sc\/character\/' + this.charId + '\/picture\/page\/([0-9]+)', "g");
+			var regex = new RegExp('\/sc\/character\/' + _this.charId + '\/picture\/page\/([0-9]+)', "g");
 			var pageUrl;
 			var maxPageNo;
 			while ((pageUrl = regex.exec(resultPage)) != null) {
 				maxPageNo = pageUrl[1];
 			}
 			for (var page = 0; page <= maxPageNo; page++) {
-				this.downloadPhotos(page);
+				_this.downloadPhotos(page);
 			}
-		});
+		}, this);
 	},
 
 	downloadPhotos: function(page) {
+		var _this = this;
 		this.requestPhotoPage(page, function(resultPage) {
 			var regexString =
-				this.escapeRegExp('http://img.dqx.jp/smpicture/download/webpicture/' + this.charId + '/thum2/')
+				_this.escapeRegExp('http://img.dqx.jp/smpicture/download/webpicture/' + _this.charId + '/thum2/')
 				+ '([0-9]+)\/';
 			var regex = new RegExp(regexString, "g");
 			var photoUrls = new Array();
@@ -36,9 +38,9 @@ var DQXPhoto = {
 				});
 			}
 			for (var i = 0; i < photoUrls.length; i++) {
-				this.downloadFile(photoUrls[i].url, photoUrls[i].id);
+				_this.downloadFile(photoUrls[i].url, photoUrls[i].id);
 			}
-		});
+		}, this);
 	},
 
 	downloadFile: function(url, filename) {
@@ -50,30 +52,31 @@ var DQXPhoto = {
 		link.dispatchEvent(event);
 	},
 
-	requestPhotoPage: function(page, func) {
+	requestPhotoPage: function(page, func, _this) {
 		if (/^[0-9]{1}$/g.test(page) == false) {
 			page = '0'; // page is 0-9
 		}
-		var url = this.baseUrl + '/sc/character/' + this.charId + '/picture/page/' + page;
+		var url = _this.baseUrl + '/sc/character/' + _this.charId + '/picture/page/' + page;
 		$.get(url, func);
 	},
 
 	loadCharacterInfo: function() {
 		var url = this.baseUrl + '/sc/home/';
+		var _this = this;
 		$.get(url, function(resultPage) {
 			// <img src="http://hiroba.dqx.jp/sc/character/{charId}/img/bup/" alt="{charName}" />
 			var pattern = '<img src\="http\:\/\/hiroba.dqx.jp\/sc\/character\/([0-9]+)\/img\/bup\/" alt\="([^"]+)" />';
 			var regex = new RegExp(pattern, 'g');
 			var matchText;
 			while ((matchText = regex.exec(resultPage)) != null) {
-				this.charId = matchText[1];
-				this.charName = matchText[2];
+				_this.charId = matchText[1];
+				_this.charName = matchText[2];
 			}
-			if (this.charId !== null) {
-				$('#character_name').text(this.charName);
+			if (_this.charId !== null) {
+				$('#character_name').text(_this.charName);
 				$("#warning").css("display", "none");
 			}
-			$("#download").attr("disabled", this.charId === null);
+			$("#download").attr("disabled", _this.charId === null);
 		});
 	},
 
@@ -81,7 +84,7 @@ var DQXPhoto = {
 	escapeRegExp: function(string) {
 		return string.replace(/([.*+?^=!:${}()|[\]\/\\])/g, "\\$1");
 	}
-}
+};
 
 $(document).ready(function() {
 	$("#download").click(function() {
