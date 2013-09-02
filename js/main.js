@@ -41,7 +41,7 @@ var DQXPhoto = {
 			var imageId, imageUrl, dateTime, location;
 
 			$(el).find('img').each(function(index, el) {
-				imageUrl = $(el).attr('src');
+				imageUrl = $(el).attr('src').replace('thum2', 'original');
 			});
 
 			var imageIdSearchResult = imageUrl.match(/[0-9]+\/$/);
